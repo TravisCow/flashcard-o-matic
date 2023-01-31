@@ -107,10 +107,9 @@ function EditDeck() {
             Cancel
           </button>
         </Link>
-        <button
-          type='submit'
+         <button
           className='btn btn-primary'
-          onSubmit={submitHandler}
+          onClick={submitHandler}
         >
           Submit
         </button>
