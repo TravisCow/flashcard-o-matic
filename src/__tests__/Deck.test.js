@@ -3,7 +3,7 @@ import { Router } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import App from "../App";
 import { createMemoryHistory } from "history";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 import {
   createCard,
   createDeck,
@@ -29,16 +29,14 @@ describe("Decks", () => {
         "Default mock response. If you see this, you probably do not need this API call.",
     });
     createDeck.mockResolvedValue({
-      name:
-        "Default mock response. If you see this, you probably do not need this API call.",
+      name: "Default mock response. If you see this, you probably do not need this API call.",
     });
     deleteCard.mockResolvedValue({
       front:
         "Default mock response. If you see this, you probably do not need this API call.",
     });
     deleteDeck.mockResolvedValue({
-      name:
-        "Default mock response. If you see this, you probably do not need this API call.",
+      name: "Default mock response. If you see this, you probably do not need this API call.",
     });
     listCards.mockResolvedValue([
       {
@@ -57,16 +55,14 @@ describe("Decks", () => {
         "Default mock response. If you see this, you probably do not need this API call.",
     });
     readDeck.mockResolvedValue({
-      name:
-        "Default mock response. If you see this, you probably do not need this API call.",
+      name: "Default mock response. If you see this, you probably do not need this API call.",
     });
     updateCard.mockResolvedValue({
       front:
         "Default mock response. If you see this, you probably do not need this API call.",
     });
     updateDeck.mockResolvedValue({
-      name:
-        "Default mock response. If you see this, you probably do not need this API call.",
+      name: "Default mock response. If you see this, you probably do not need this API call.",
     });
   });
 
@@ -92,7 +88,7 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const titleElements = await screen.findAllByText("Mock Deck 3");
@@ -108,7 +104,7 @@ describe("Decks", () => {
     const { container } = render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const titleElements = await screen.findAllByText("Create Deck");
@@ -136,7 +132,7 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const nameInput = await screen.findByDisplayValue("Mock Deck 33");
@@ -161,7 +157,7 @@ describe("Decks", () => {
     const { container } = render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const deckNameElements = await screen.findAllByText("Mock squash");
@@ -206,11 +202,11 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const frontTextArea = await screen.findByDisplayValue(
-      "What did the left eye say to the right eye?"
+      "What did the left eye say to the right eye?",
     );
     expect(frontTextArea).toBeTruthy();
   });
@@ -249,7 +245,7 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const deckName = await screen.findByText("Mock Study Deck 42");
@@ -299,7 +295,7 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     await screen.findByText("Mock Study Deck 73");
@@ -326,7 +322,7 @@ describe("Decks", () => {
     render(
       <Router history={history}>
         <App />
-      </Router>
+      </Router>,
     );
 
     const deckName = await screen.findByText("Mock Study Deck 13");

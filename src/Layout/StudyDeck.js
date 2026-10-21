@@ -1,11 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { readDeck } from '../utils/api';
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useParams, useHistory } from "react-router-dom";
+import { readDeck } from "../utils/api";
 
 function StudyDeck() {
+  const [error, setError] = useState(null);
+  const history = useHistory();
+  const [loading, setLoading] = useState(true);
   const mountedRef = useRef(false);
   const initialState = {
-    deck: { name: 'loading...', cards: [] },
+    deck: { name: "loading...", cards: [] },
     isCardFlipped: false,
     currentIndex: 0,
   };
@@ -23,6 +26,8 @@ function StudyDeck() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     const abortController = new AbortController();
     async function loadDeck() {
       try {
@@ -31,15 +36,19 @@ function StudyDeck() {
           setStudyDeckState((currentState) => ({
             ...currentState,
             deck: loadedDeck,
+            currentIndex: 0,
+            isCardFlipped: false,
           }));
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
-          throw error;
+        if (error.name !== "AbortError") {
+          setError(error.message || "Something went wrong. Please try again.");
         }
       }
     }
-    loadDeck();
+    loadDeck().finally(() => {
+      if (mountedRef.current) setLoading(false);
+    });
     return () => {
       abortController.abort();
     };
@@ -48,7 +57,7 @@ function StudyDeck() {
   function flipCardHandler() {
     setStudyDeckState({
       ...studyDeckState,
-      isCardFlipped: !studyDeckState['isCardFlipped'],
+      isCardFlipped: !studyDeckState["isCardFlipped"],
     });
   }
 
@@ -56,57 +65,66 @@ function StudyDeck() {
     const { cards } = deck;
     if (currentIndex === cards.length - 1) {
       const response = window.confirm(
-        'Do you want to restart the deck and study again?'
+        "Do you want to restart the deck and study again?",
       );
       if (response) {
         setStudyDeckState((currentState) => ({
           ...currentState,
           currentIndex: 0,
+          isCardFlipped: false,
         }));
+      } else {
+        history.push(`/decks/${deckId}`);
       }
     } else {
       setStudyDeckState((currentState) => ({
         ...currentState,
-        currentIndex: currentState.currentIndex++,
+        currentIndex: currentState.currentIndex + 1,
         isCardFlipped: !currentState.isCardFlipped,
       }));
     }
   }
 
   const breadcrumb = (
-    <nav aria-label='breadcrumb'>
-      <ol className='breadcrumb'>
-        <li className='breadcrumb-item'>
-          <Link to='/'>
-            <i className='fas fa-home'></i> Home
+    <nav aria-label="breadcrumb">
+      <ol className="breadcrumb">
+        <li className="breadcrumb-item">
+          <Link to="/">
+            <i className="fas fa-home"></i> Home
           </Link>
         </li>
-        <li className='breadcrumb-item'>
+        <li className="breadcrumb-item">
           <Link to={`/decks/${deckId}`}>{deck.name}</Link>
         </li>
-        <li className='breadcrumb-item active' aria-current='page'>
+        <li className="breadcrumb-item active" aria-current="page">
           Study
         </li>
       </ol>
     </nav>
   );
 
+  if (loading) return <p role="status">Loading deck…</p>;
+  if (error) return <p role="alert">{error}</p>;
+
   if (deck.cards.length <= 2) {
     return (
       <React.Fragment>
+        {error && (
+          <p role="alert" className="error">
+            {error}
+          </p>
+        )}
         {breadcrumb}
-        <div className='card'>
-          <div className='card-body'>
+        <div className="card">
+          <div className="card-body">
             <h1>{deck.name}: Study</h1>
-            <h2 className='card-title'>Not enough cards.</h2>
-            <p className='card-text'>
+            <h2 className="card-title">Not enough cards.</h2>
+            <p className="card-text">
               You need at least 3 cards to study. Please add more cards to this
               deck.
             </p>
             <Link to={`/decks/${deckId}/cards/new`}>
-              <button type='button' className='btn btn-primary'>
-                <i className='fas fa-plus'></i> Add Card
-              </button>
+              <i className="fas fa-plus"></i> Add Card
             </Link>
           </div>
         </div>
@@ -115,29 +133,34 @@ function StudyDeck() {
   } else {
     return (
       <React.Fragment>
+        {error && (
+          <p role="alert" className="error">
+            {error}
+          </p>
+        )}
         {breadcrumb}
-        <h1 className='text-center'>Currently Studying: {deck.name} </h1>
-        <div className='card'>
-          <div className='card-body'>
-            <h4 className='card-title'>
+        <h1 className="text-center">Currently Studying: {deck.name} </h1>
+        <div className="card">
+          <div className="card-body">
+            <h4 className="card-title">
               Card {currentIndex + 1} of {deck.cards.length}
             </h4>
-            <h5 className='card-text'>
+            <h5 className="card-text">
               {!isCardFlipped
                 ? `Question: ${deck.cards[currentIndex].front}`
                 : `Answer: ${deck.cards[currentIndex].back}`}
             </h5>
           </div>
           <button
-            type='button'
-            className='btn btn-secondary py-3'
+            type="button"
+            className="btn btn-secondary py-3"
             onClick={() => flipCardHandler()}
           >
             Flip
           </button>
           {isCardFlipped && (
             <button
-              className='btn btn-primary py-3'
+              className="btn btn-primary py-3"
               onClick={getNextCardHandler}
             >
               Next
